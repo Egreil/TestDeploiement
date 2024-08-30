@@ -1,0 +1,32 @@
+name: testDeTestDeploiement
+on: [push,workflow_dispatch]
+jobs:
+  buildJob:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-java@v4
+        - name: login to docker hub
+          id: docker-hub
+          env:
+            username: ${{secrets.DOCKERHUB_USERNAME}}
+            password: ${{secrets.DOCKERHUB_PASSWORD}}
+          run: |
+            docker login -u $username -p $password 
+        - name: build the docker image
+          id: build-docker-image
+          run: |
+            ls -la 
+            docker build . -f Dockerfile -t dhruvin30/demo-image-test:latest
+        - name: push the docker image
+          id: push-docker-image
+          run: docker push ${{secrets.DOCKERHUB_USERNAME}}/demo-image-test:latest
+          
+  deployJob:
+       runs-on: ubuntu-latest
+       steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-java@v4
+        - name: deploy
+          run: echo "test en cours"
+        # - uses: azure/webapps-deploy@v2
